@@ -62,11 +62,11 @@ export function analyzeExpenses(
   }
 
   const fixedCostTotal = expenses
-    .filter((item) => item.costType === "fixed")
+    .filter((item) => item.type === "fixed")
     .reduce((sum, item) => sum + item.amount, 0)
 
   const variableCostTotal = expenses
-    .filter((item) => item.costType === "variable")
+    .filter((item) => item.type === "variable")
     .reduce((sum, item) => sum + item.amount, 0)
 
   // Use the correct value from NecessityLevel type or enum

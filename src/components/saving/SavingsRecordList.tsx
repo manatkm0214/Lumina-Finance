@@ -5,7 +5,7 @@ import type { SavingsRecordItem } from "@/types/finance"
 
 type SavingsRecordListProps = {
   items: SavingsRecordItem[]
-  onDeleteItem: (id: string) => void
+  onDeleteItemAction: (id: string) => void
 }
 
 function formatCurrency(value: number) {
@@ -22,7 +22,7 @@ function getTypeLabel(value: string) {
 
 export function SavingsRecordList({
   items,
-  onDeleteItem,
+  onDeleteItemAction,
 }: SavingsRecordListProps) {
   if (items.length === 0) {
     return <p className="text-slate-500">貯金記録がありません</p>
@@ -46,7 +46,7 @@ export function SavingsRecordList({
 
               <button
                 type="button"
-                onClick={() => onDeleteItem(item.id)}
+                onClick={() => onDeleteItemAction(item.id)}
                 className="mt-2 rounded bg-red-600 px-3 py-1 text-sm font-bold text-white"
               >
                 削除

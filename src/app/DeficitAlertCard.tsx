@@ -6,6 +6,7 @@ import {
   getDeficitAlertLevel,
   getDeficitAlertMessage,
 } from "@/lib/calc/basic"
+import type { ExpenseItem, IncomeItem } from "@/types/finance"
 
 function getStyle(level: "safe" | "caution" | "warning" | "danger") {
   switch (level) {
@@ -21,18 +22,35 @@ function getStyle(level: "safe" | "caution" | "warning" | "danger") {
 }
 
 export function DeficitAlertCard() {
-  const state = {
-    incomes: [
-      { id: "1", amount: 1000, source: "給与", date: "2024-06-01", memo: "" },
-      { id: "2", amount: 2000, source: "副業", date: "2024-06-01", memo: "" },
-    ],
-    expenses: [
-      { id: "1", amount: 1200, category: "家賃", date: "2024-06-01", memo: "" },
-      { id: "2", amount: 800, category: "食費", date: "2024-06-01", memo: "" },
-    ],
-  }
+  const incomes: IncomeItem[] = [
+    { id: "1", amount: 1000, source: "給与", date: "2024-06-01", memo: "" },
+    { id: "2", amount: 2000, source: "副業", date: "2024-06-01", memo: "" },
+  ]
 
-  const currentDeficitRate = deficitRate(state.incomes, state.expenses)
+  const expenses: ExpenseItem[] = [
+    {
+      id: "1",
+      amount: 1200,
+      category: "家賃" as ExpenseItem["category"],
+      date: "2024-06-01",
+      memo: "",
+      type: "fixed",
+      necessity: "need",
+      costType: "monthly",
+    },
+    {
+      id: "2",
+      amount: 800,
+      category: "食費" as ExpenseItem["category"],
+      date: "2024-06-01",
+      memo: "",
+      type: "variable",
+      necessity: "need",
+      costType: "monthly",
+    },
+  ]
+
+  const currentDeficitRate = deficitRate(incomes, expenses)
   const level = getDeficitAlertLevel(currentDeficitRate)
   const message = getDeficitAlertMessage(currentDeficitRate)
 

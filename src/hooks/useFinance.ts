@@ -4,6 +4,7 @@ export type UXMode = "standard" | "cheer" | "spartan"
 
 export type ExpenseCategory =
   | "food"
+  | "daily"
   | "housing"
   | "utility"
   | "communication"
@@ -11,8 +12,16 @@ export type ExpenseCategory =
   | "transport"
   | "entertainment"
   | "medical"
+  | "education"
   | "other"
 
+export interface ExpenseItem {
+  id: string
+  amount: number
+  category: ExpenseCategory
+  date: string
+  memo: string
+}
 export type SavingsGoalPeriod = "1m" | "12m"
 
 export interface IncomeItem {
@@ -23,13 +32,15 @@ export interface IncomeItem {
   memo: string
 }
 
-export interface ExpenseItem {
-  id: string
-  date: string
-  category: ExpenseCategory
-  amount: number
-  memo: string
-}
+const expenses: ExpenseItem[] = [
+  {
+    id: "1",
+    amount: 1200,
+    category: "food",
+    date: "2026-03-15",
+    memo: "ランチ"
+  }
+]
 
 export interface FinanceState {
   incomes: IncomeItem[]

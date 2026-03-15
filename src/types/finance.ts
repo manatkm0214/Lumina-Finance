@@ -96,6 +96,9 @@ export interface IncomeItem {
 }
 
 export interface ExpenseItem {
+  type: "fixed" | "variable"
+  necessity: any
+  costType: string
   id: string
   date: string
   category: ExpenseCategory
