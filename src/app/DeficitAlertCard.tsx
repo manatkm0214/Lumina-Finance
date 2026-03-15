@@ -21,15 +21,14 @@ function getStyle(level: "safe" | "caution" | "warning" | "danger") {
 }
 
 export function DeficitAlertCard() {
-  // TODO: Replace these sample values with actual state management or props
   const state = {
     incomes: [
       { id: "1", amount: 1000, source: "給与", date: "2024-06-01", memo: "" },
       { id: "2", amount: 2000, source: "副業", date: "2024-06-01", memo: "" },
     ],
     expenses: [
-      { id: "1", amount: 1200, category: "家賃" },
-      { id: "2", amount: 800, category: "食費" },
+      { id: "1", amount: 1200, category: "家賃", date: "2024-06-01", memo: "" },
+      { id: "2", amount: 800, category: "食費", date: "2024-06-01", memo: "" },
     ],
   }
 
