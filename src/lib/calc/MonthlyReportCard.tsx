@@ -194,18 +194,70 @@ function useFinance(): { state: { incomes: IncomeItem[]; expenses: ExpenseItem[]
     const fetchData = async () => {
       const incomes: IncomeItem[] = [
         {
-          id: "1", amount: 300000, date: "2024-06-01", memo: "",
-          source: ""
+          id: "1",
+          amount: 300000,
+          date: "2024-06-01",
+          category: "salary",
+          source: "",
+          memo: "",
+          createdAt: "2024-06-01T00:00:00.000Z",
+          updatedAt: "2024-06-01T00:00:00.000Z",
         },
         {
-          id: "2", amount: 5000, date: "2024-06-10", memo: "",
-          source: ""
+          id: "2",
+          amount: 5000,
+          date: "2024-06-10",
+          category: "sideJob",
+          source: "",
+          memo: "",
+          createdAt: "2024-06-10T00:00:00.000Z",
+          updatedAt: "2024-06-10T00:00:00.000Z",
         },
       ]
+
       const expenses: ExpenseItem[] = [
-        { id: "1", amount: 80000, date: "2024-06-02", category: expenseCategoryOptions[0].value as ExpenseItem["category"], memo: "" },
-        { id: "2", amount: 20000, date: "2024-06-05", category: expenseCategoryOptions[1].value as ExpenseItem["category"], memo: "" },
-        { id: "3", amount: 10000, date: "2024-06-15", category: expenseCategoryOptions[2].value as ExpenseItem["category"], memo: "" },
+        {
+          id: "1",
+          amount: 80000,
+          date: "2024-06-02",
+          category: expenseCategoryOptions[0].value as ExpenseItem["category"],
+          memo: "",
+          paymentMethod: "cash",
+          account: "mainBank",
+          type: "fixed",
+          costType: "monthly",
+          necessity: "need",
+          createdAt: "2024-06-02T00:00:00.000Z",
+          updatedAt: "2024-06-02T00:00:00.000Z",
+        },
+        {
+          id: "2",
+          amount: 20000,
+          date: "2024-06-05",
+          category: expenseCategoryOptions[1].value as ExpenseItem["category"],
+          memo: "",
+          paymentMethod: "cash",
+          account: "mainBank",
+          type: "variable",
+          costType: "temporary",
+          necessity: "want",
+          createdAt: "2024-06-05T00:00:00.000Z",
+          updatedAt: "2024-06-05T00:00:00.000Z",
+        },
+        {
+          id: "3",
+          amount: 10000,
+          date: "2024-06-15",
+          category: expenseCategoryOptions[2].value as ExpenseItem["category"],
+          memo: "",
+          paymentMethod: "cash",
+          account: "mainBank",
+          type: "variable",
+          costType: "temporary",
+          necessity: "impulse",
+          createdAt: "2024-06-15T00:00:00.000Z",
+          updatedAt: "2024-06-15T00:00:00.000Z",
+        },
       ]
       setState({ incomes, expenses })
       setIsLoaded(true)

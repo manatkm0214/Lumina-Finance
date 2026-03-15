@@ -18,49 +18,67 @@ import { SavingsRecordList } from "@/components/saving/SavingsRecordList"
 import { expenseCategoryOptions } from "@/constants/options"
 
 import type {
+  AppSettings,          // ← finance.ts からインポート
   ExpenseCategory,
   ExpenseItem,
   FinanceState,
   IncomeItem,
   SavingsRecordItem,
+  SavingsGoalPeriod,
 } from "@/types/finance"
+import type { ForecastShortPeriod, ForecastMonthsMap } from "@/types/finance"
 
-type ForecastPeriod = "3m" | "6m" | "1y" | "3y" | "5y"
-type SavingsGoalPeriod = "1m" | "12m"
+const FORECAST_MONTHS: ForecastMonthsMap = {
+  "3m": 3,
+  "6m": 6,
+  "1y": 12,
+  "5y": 60,
+}
+
 type MoneyMode = "emergency" | "fullSave" | "normal"
 type GuardRank = "S" | "A" | "B" | "C" | "D"
 type DeficitLevel = "safe" | "caution" | "warning" | "danger"
 
-type AppSettings = {
-  monthlyLivingCost: number
-  currentEmergencyFund: number
-  savingsGoalAmount: number
-  savingsGoalPeriod: SavingsGoalPeriod
-}
-
-const STORAGE_KEY = "rebalance-finance-state-v5"
-const SETTINGS_KEY = "rebalance-finance-settings-v5"
-
-const FORECAST_MONTH_MAP: Record<ForecastPeriod, number> = {
-  "3m": 3,
-  "6m": 6,
-  "1y": 12,
-  "3y": 36,
-  "5y": 60,
-}
-
-const initialState: FinanceState = {
-  incomes: [],
-  expenses: [],
-  savingsRecords: [],
-  uxMode: "standard",
-}
+const STORAGE_KEY = "rebalance-finance-state-v4"
+const SETTINGS_KEY = "rebalance-finance-settings-v4"
 
 const initialSettings: AppSettings = {
+  budgetPeriod: "monthly",        // ← 追加
+  household: {                    // ← 追加
+    familySize: "1",
+    housing: {
+      type: "rent",
+      monthlyRent: 0,
+      monthlyMortgage: 0,
+      monthlyManagementFee: 0,
+      monthlyRepairReserve: 0,
+      monthlyParkingFee: 0,
+    },
+  },
+  bucketRules: [],                // ← 追加
+  investmentUnlockCondition: {
+    maxDeficitRate: 0.05,
+    maxFixedCostRate: 0.5,
+    minSavingsRate: 0.2,
+    targetEmergencyFundMonths: 6,
+  },
   monthlyLivingCost: 0,
   currentEmergencyFund: 0,
   savingsGoalAmount: 0,
   savingsGoalPeriod: "1m",
+}
+
+const initialState: FinanceState = {
+  settings: initialSettings,
+  incomes: [],
+  expenses: [],
+  emotions: [],
+  budgets: [],
+  savingsRecords: [],
+  deficit: 0,
+  savingGoal: 0,
+  uxMode: "standard",
+  forecastPeriod: "6m",
 }
 
 function formatCurrency(value: number) {
@@ -107,10 +125,17 @@ function loadSettings(): AppSettings {
     return {
       ...initialSettings,
       ...parsed,
+      budgetPeriod: parsed.budgetPeriod ?? "monthly",
+      household: parsed.household ?? initialSettings.household,
+      bucketRules: parsed.bucketRules ?? [],
       monthlyLivingCost: Number(parsed.monthlyLivingCost ?? 0),
       currentEmergencyFund: Number(parsed.currentEmergencyFund ?? 0),
       savingsGoalAmount: Number(parsed.savingsGoalAmount ?? 0),
       savingsGoalPeriod: parsed.savingsGoalPeriod === "12m" ? "12m" : "1m",
+      investmentUnlockCondition: {
+        ...initialSettings.investmentUnlockCondition,
+        ...(parsed.investmentUnlockCondition ?? {}),
+      },
     }
   } catch {
     return initialSettings
@@ -178,7 +203,7 @@ function getModeDescription(mode: MoneyMode) {
     case "fullSave":
       return "赤字または貯金目標の達成率が弱いです。固定費・変動費を見直して全力で貯金を寄せます。"
     case "normal":
-      return "防衛資金と先取り貯金が安定しています。このまま継続できています。"
+      return "防衛資金と先取り貯金が安定しています。このまま継続できます。"
   }
 }
 
@@ -319,7 +344,8 @@ export default function Home() {
   const [expenseSearch, setExpenseSearch] = useState("")
   const [expenseCategoryFilter, setExpenseCategoryFilter] =
     useState<ExpenseCategory | "all">("all")
-  const [forecastPeriod, setForecastPeriod] = useState<ForecastPeriod>("3m")
+  const [forecastPeriod, setForecastPeriod] = useState<ForecastShortPeriod>("3m")
+  const months = FORECAST_MONTHS[forecastPeriod]  // ← Home 関数内に移動済みであることを確認
 
   useEffect(() => {
     setState(loadState())
@@ -476,7 +502,6 @@ export default function Home() {
     [state.expenses]
   )
 
-  const months = FORECAST_MONTH_MAP[forecastPeriod]
   const forecastIncome = totalIncome * months
   const forecastExpense = totalExpense * months
   const forecastBalance = forecastIncome - forecastExpense
@@ -823,14 +848,15 @@ export default function Home() {
 
             <select
               value={forecastPeriod}
-              onChange={(e) => setForecastPeriod(e.target.value as ForecastPeriod)}
+              onChange={(e) => setForecastPeriod(e.target.value as ForecastShortPeriod)}
               className="rounded border px-3 py-2"
             >
-              <option value="3m">3ヶ月</option>
-              <option value="6m">6ヶ月</option>
-              <option value="1y">1年</option>
-              <option value="3y">3年</option>
-              <option value="5y">5年</option>
+              <option value="1month">1ヶ月</option>
+              <option value="3months">3ヶ月</option>
+              <option value="6months">6ヶ月</option>
+              <option value="1year">1年</option>
+              <option value="3years">3年</option>
+              <option value="5years">5年</option>
             </select>
           </div>
 
@@ -982,13 +1008,13 @@ export default function Home() {
           />
         </section>
 
-        <SavingsRecordForm onAddItem={addSavingsRecord} />
+        <SavingsRecordForm onAddItemAction={addSavingsRecord} />
 
         <section className="rounded-xl bg-white p-4 shadow">
           <h2 className="mb-4 text-lg font-bold text-slate-800">貯金記録一覧</h2>
           <SavingsRecordList
-            items={state.savingsRecords ?? []}
-            onDeleteItem={deleteSavingsRecord}
+            items={state.savingsRecords}
+            onDeleteItemAction={deleteSavingsRecord}
           />
         </section>
       </div>

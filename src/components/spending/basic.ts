@@ -42,7 +42,7 @@ export function fixedCostRate(expenses: ExpenseItem[]): number {
   if (totalExpense <= 0) return 0
 
   const fixedExpenseTotal = expenses
-    .filter((item) => item.costType === "fixed")
+    .filter((item) => item.type === "fixed")
     .reduce((sum, item) => sum + item.amount, 0)
 
   return fixedExpenseTotal / totalExpense

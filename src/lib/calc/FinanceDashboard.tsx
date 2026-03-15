@@ -29,7 +29,7 @@ function levelStyles(level: "safe" | "caution" | "warning" | "danger") {
 }
 
 export function FinanceDashboard() {
-  const { state, isLoaded } = useFinance()
+  const { state } = useFinance()
 
   const summary = useMemo(() => {
     const totalIncome = sumIncomeItems(state.incomes)
@@ -51,14 +51,6 @@ export function FinanceDashboard() {
       deficitMessage: getDeficitAlertMessage(currentDeficitRate),
     }
   }, [state.expenses, state.incomes])
-
-  if (!isLoaded) {
-    return (
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm text-slate-500">読み込み中...</p>
-      </section>
-    )
-  }
 
   return (
     <section className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

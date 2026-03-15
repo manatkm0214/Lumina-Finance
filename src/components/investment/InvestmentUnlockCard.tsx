@@ -1,6 +1,6 @@
 "use client"
 
-import { JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useMemo } from "react"
+import { useMemo } from "react"
 import { useFinanceContext } from "@/hooks/useFinanceContext"
 import { formatCurrency, formatPercent } from "@/lib/calc/basic"
 import { calculateInvestmentUnlockStatus } from "@/app/investment"
@@ -9,12 +9,22 @@ export function InvestmentUnlockCard() {
   const { state } = useFinanceContext()
 
   const status = useMemo(() => {
+    const condition = {
+      ...state.settings.investmentUnlockCondition,
+      emergencyFundTargetMonths:
+        state.settings.investmentUnlockCondition.targetEmergencyFundMonths,
+    }
+
     return calculateInvestmentUnlockStatus(
       state.incomes,
       state.expenses,
-      state.settings.investmentUnlockCondition
+      condition
     )
   }, [state.expenses, state.incomes, state.settings.investmentUnlockCondition])
+
+  const reasons = (status.reasons ?? [])
+    .map((reason) => String(reason))
+    .filter((reason) => reason.trim().length > 0)
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
@@ -71,16 +81,9 @@ export function InvestmentUnlockCard() {
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-sm font-semibold text-slate-900">未達成項目</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-700">
-              {status.reasons
-                .filter(
-                  (reason: unknown): reason is string | number | ReactElement => 
-                    typeof reason === "string" ||
-                    typeof reason === "number" ||
-                    (reason !== null && reason !== undefined && typeof reason === "object" && "type" in reason)
-                )
-                .map((reason: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: number) => (
-                  <li key={idx}>・{reason}</li>
-                ))}
+              {reasons.map((reason, idx) => (
+                <li key={idx}>・{reason}</li>
+              ))}
             </ul>
           </div>
         </div>

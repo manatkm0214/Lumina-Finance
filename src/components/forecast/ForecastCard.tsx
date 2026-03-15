@@ -1,24 +1,35 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { useFinanceContext } from "@/hooks/useFinanceContext"
+import { useContext, useMemo, useState } from "react"
+import { FinanceContext } from "@/lib/context/FinanceContext"
 import { calculateForecast } from "@/lib/calc/forecast"
 import { formatCurrency } from "@/lib/calc/basic"
-import type { ForecastPeriod, SelectOption } from "@/types/finance"
+import type { ForecastPeriod, ForecastShortPeriod, SelectOption } from "@/types/finance"
 import { SelectField } from "@/components/common/SelectField"
 
-const forecastPeriodOptions: SelectOption<ForecastPeriod>[] = [
+const forecastPeriodOptions: SelectOption<ForecastShortPeriod>[] = [
   { value: "3m", label: "3ヶ月" },
   { value: "6m", label: "6ヶ月" },
   { value: "1y", label: "1年" },
 ]
 
+const SHORT_TO_PERIOD: Record<ForecastShortPeriod, ForecastPeriod> = {
+  "3m": "3months",
+  "6m": "6months",
+  "1y": "1year",
+  "5y": "1month"
+}
+
 export function ForecastCard() {
-  const { state } = useFinanceContext()
-  const [period, setPeriod] = useState<ForecastPeriod>("3m")
+  const finance = useContext(FinanceContext)
+  if (!finance) throw new Error("FinanceContext.Provider でラップしてください")
+
+  const { state } = finance
+  const [period, setPeriod] = useState<ForecastShortPeriod>("3m")
 
   const result = useMemo(() => {
-    return calculateForecast(state.incomes ?? [], state.expenses ?? [], period)
+    const normalizedPeriod = SHORT_TO_PERIOD[period]
+    return calculateForecast(state.incomes ?? [], state.expenses ?? [], normalizedPeriod)
   }, [period, state.expenses, state.incomes])
 
   return (
@@ -38,30 +49,22 @@ export function ForecastCard() {
       <div className="grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm text-slate-500">予測収入</p>
-          <p className="mt-2 text-xl font-bold text-sky-700">
-            {formatCurrency(result.projectedIncome)}
-          </p>
+          <p className="mt-2 text-xl font-bold text-sky-700">{formatCurrency(result.projectedIncome)}</p>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm text-slate-500">予測支出</p>
-          <p className="mt-2 text-xl font-bold text-rose-600">
-            {formatCurrency(result.projectedExpense)}
-          </p>
+          <p className="mt-2 text-xl font-bold text-rose-600">{formatCurrency(result.projectedExpense)}</p>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm text-slate-500">予測収支</p>
-          <p className="mt-2 text-xl font-bold text-slate-900">
-            {formatCurrency(result.projectedBalance)}
-          </p>
+          <p className="mt-2 text-xl font-bold text-slate-900">{formatCurrency(result.projectedBalance)}</p>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
           <p className="text-sm text-slate-500">見込み貯蓄</p>
-          <p className="mt-2 text-xl font-bold text-violet-700">
-            {formatCurrency(result.projectedSavings)}
-          </p>
+          <p className="mt-2 text-xl font-bold text-violet-700">{formatCurrency(result.projectedSavings)}</p>
         </div>
       </div>
 

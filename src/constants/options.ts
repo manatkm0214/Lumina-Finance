@@ -7,6 +7,7 @@ import type {
   NecessityLevel,
   PaymentMethod,
   SelectOption,
+  SavingsRecordType,
 } from "@/types/finance"
 
 export const incomeCategoryOptions: SelectOption<IncomeCategory>[] = [
@@ -22,9 +23,9 @@ export const expenseCategoryOptions: SelectOption<ExpenseCategory>[] = [
   { value: "food", label: "食費" },
   { value: "daily", label: "日用品" },
   { value: "housing", label: "住居費" },
-  { value: "utilities", label: "水道光熱費" },
+  { value: "utility", label: "水道光熱費" },
   { value: "communication", label: "通信費" },
-  { value: "transportation", label: "交通費" },
+  { value: "transport", label: "交通費" },
   { value: "medical", label: "医療費" },
   { value: "education", label: "教育費" },
   { value: "entertainment", label: "娯楽費" },
@@ -34,7 +35,7 @@ export const expenseCategoryOptions: SelectOption<ExpenseCategory>[] = [
   { value: "other", label: "その他" },
 ]
 
-export const expenseSubCategoryOptionsMap: Record<
+export const expenseSubCategories: Record<
   ExpenseCategory,
   SelectOption<ExpenseSubCategory>[]
 > = {
@@ -50,9 +51,16 @@ export const expenseSubCategoryOptionsMap: Record<
   ],
   housing: [
     { value: "rent", label: "家賃" },
-    { value: "misc", label: "その他住居費" },
+    { value: "mortgage", label: "住宅ローン" },
+    { value: "managementFee", label: "管理費" },
+    { value: "repairReserve", label: "修繕積立金" },
+    { value: "parking", label: "駐車場" },
+    { value: "furniture", label: "家具" },
+    { value: "appliances", label: "家電" },
+    { value: "moving", label: "引っ越し" },
+    { value: "other", label: "その他" },
   ],
-  utilities: [
+  utility: [
     { value: "electricity", label: "電気" },
     { value: "gas", label: "ガス" },
     { value: "water", label: "水道" },
@@ -61,7 +69,7 @@ export const expenseSubCategoryOptionsMap: Record<
     { value: "mobile", label: "携帯" },
     { value: "internet", label: "ネット" },
   ],
-  transportation: [
+  transport: [
     { value: "train", label: "電車" },
     { value: "bus", label: "バス" },
     { value: "misc", label: "その他交通費" },
@@ -72,6 +80,7 @@ export const expenseSubCategoryOptionsMap: Record<
   ],
   education: [
     { value: "books", label: "本・教材" },
+    { value: "tuition", label: "学費" },
     { value: "misc", label: "その他教育費" },
   ],
   entertainment: [
@@ -92,11 +101,6 @@ export const expenseSubCategoryOptionsMap: Record<
     { value: "misc", label: "その他税金" },
   ],
   other: [{ value: "misc", label: "その他" }],
-  social: [],
-  subscription: [],
-  special: [],
-  utility: [],
-  transport: []
 }
 
 export const paymentMethodOptions: SelectOption<PaymentMethod>[] = [
@@ -117,14 +121,15 @@ export const accountOptions: SelectOption<AccountType>[] = [
 ]
 
 export const costTypeOptions: SelectOption<CostType>[] = [
-  { value: "fixed", label: "固定費" },
-  { value: "variable", label: "変動費" },
+  { value: "monthly", label: "毎月" },
+  { value: "yearly", label: "年次" },
+  { value: "temporary", label: "一時" },
 ]
 
 export const necessityOptions: SelectOption<NecessityLevel>[] = [
-  { value: "essential", label: "必要" },
-  { value: "important", label: "重要" },
-  { value: "optional", label: "自由" },
+  { value: "need", label: "必要" },
+  { value: "want", label: "欲しい" },
+  { value: "impulse", label: "衝動" },
 ]
 
 export const paymentMethodLabelMap: Record<PaymentMethod, string> = {
@@ -145,18 +150,20 @@ export const accountLabelMap: Record<AccountType, string> = {
 }
 
 export const costTypeLabelMap: Record<CostType, string> = {
-  fixed: "固定費",
-  variable: "変動費",
+  monthly: "毎月",
+  yearly: "年次",
+  temporary: "一時",
 }
 
 export const necessityLabelMap: Record<NecessityLevel, string> = {
-  essential: "必要",
-  important: "重要",
-  optional: "自由",
+  need: "必要",
+  want: "欲しい",
+  impulse: "衝動",
 }
 
-export const savingsRecordTypeOptions = [
-  { value: "normal", label: "通常貯金" },
-  { value: "investment", label: "投資用" },
-  { value: "emergency", label: "緊急資金" },
-] as const
+export const savingsRecordTypeOptions: SelectOption<SavingsRecordType>[] = [
+  { value: "regularSavings", label: "通常貯金" },
+  { value: "fixedDeposit", label: "定期預金" },
+  { value: "ordinaryDeposit", label: "普通預金" },
+  { value: "investmentProfit", label: "投資利益" },
+]

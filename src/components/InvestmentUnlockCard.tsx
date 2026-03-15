@@ -1,15 +1,15 @@
 "use client"
 
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useMemo } from "react"
-import { useFinanceContext } from "@/hooks/useFinanceContext"
-import { calculateInvestmentUnlockStatus } from "@/lib/calc/investment"
+import { useMemo } from "react"
+import { useFinance } from "@/hooks/useFinance"
+import { calculateInvestmentUnlock } from "@/lib/calc/investmentUnlock"
 import { formatCurrency, formatPercent } from "@/lib/calc/basic"
 
 export function InvestmentUnlockCard() {
-  const { state } = useFinanceContext()
+  const { state } = useFinance()
 
   const status = useMemo(() => {
-    return calculateInvestmentUnlockStatus(
+    return calculateInvestmentUnlock(
       state.incomes,
       state.expenses,
       state.settings.investmentUnlockCondition
@@ -71,16 +71,9 @@ export function InvestmentUnlockCard() {
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-sm font-semibold text-slate-900">未達成項目</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-700">
-              {status.reasons
-                .filter(
-                  (reason: unknown): reason is string | number | ReactElement => 
-                    typeof reason === "string" ||
-                    typeof reason === "number" ||
-                    (reason !== null && reason !== undefined && typeof reason === "object" && "type" in reason)
-                )
-                .map((reason: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: number) => (
-                  <li key={idx}>・{reason}</li>
-                ))}
+              {status.reasons.map((reason: string, idx: number) => (
+                <li key={idx}>・{reason}</li>
+              ))}
             </ul>
           </div>
         </div>

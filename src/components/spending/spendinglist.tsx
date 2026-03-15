@@ -38,7 +38,7 @@ export function ExpenseList({ items, onEditAction, onDeleteAction }: Props) {
       {items.length === 0 && <p className="text-slate-500">データがありません</p>}
 
       {items.map((e) => {
-        const subOptions = expenseSubCategories[e.category as ExpenseCategory] ?? []
+        const subOptions = expenseSubCategories[e.category] ?? []
         const subLabel = subOptions.find((o) => o.value === e.subCategory)?.label ?? e.subCategory
 
         return (

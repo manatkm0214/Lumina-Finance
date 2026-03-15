@@ -1,19 +1,19 @@
 import type {
   ExpenseItem,
-  ForecastPeriod,
-   IncomeItem,
+  ForecastShortPeriod,
+  ForecastMonthsMap,
+  IncomeItem,
 } from "@/types/finance"
 import { sumExpenseItems, sumIncomeItems } from "@/lib/calc/basic"
-
-type ForecastMonthsMap = Record<ForecastPeriod, number>
 
 const FORECAST_MONTHS: ForecastMonthsMap = {
   "3m": 3,
   "6m": 6,
   "1y": 12,
+  "5y": 0
 }
 
-function getMonths(period: ForecastPeriod) {
+function getMonths(period: ForecastShortPeriod) {
   return FORECAST_MONTHS[period]
 }
 
@@ -38,9 +38,9 @@ function getMonthlyAverageFromDatedItems<T extends { date: string; amount: numbe
 export function calculateForecast(
   incomes: IncomeItem[],
   expenses: ExpenseItem[],
-  period: ForecastPeriod
+  period: ForecastShortPeriod
 ): {
-  period: ForecastPeriod
+  period: ForecastShortPeriod
   projectedIncome: number
   projectedExpense: number
   projectedBalance: number

@@ -1,14 +1,12 @@
-import type { ExpenseItem, IncomeItem } from "@/types/finance"
+import type { ExpenseItem, IncomeItem, InvestmentUnlockCondition } from "@/types/finance"
 
 import {
   sumExpenseItems,
   sumIncomeItems,
   deficitRate,
   fixedCostRate,
-  savingsRate
+  savingsRate,
 } from "@/lib/calc/basic"
-
-
 
 export type InvestmentUnlockResult = {
 
@@ -29,10 +27,9 @@ export type InvestmentUnlockResult = {
 
 
 export function calculateInvestmentUnlock(
-
   incomes: IncomeItem[],
-  expenses: ExpenseItem[]
-
+  expenses: ExpenseItem[],
+  condition: InvestmentUnlockCondition   // 3番目は condition のみ
 ): InvestmentUnlockResult {
 
   const income =

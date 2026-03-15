@@ -1,21 +1,17 @@
-import type {
-  ExpenseItem,
-  IncomeItem,
-} from "@/types/finance"
+import type { ExpenseItem, IncomeItem, ForecastPeriod } from "@/types/finance"
 import { sumExpenseItems, sumIncomeItems } from "@/lib/calc/basic"
 
-export type ForecastPeriod = "3m" | "6m" | "1y" | "3y" | "5y";
-
 export const FORECAST_MONTHS: Record<ForecastPeriod, number> = {
-  "3m": 3,
-  "6m": 6,
-  "1y": 12,
-  "3y": 36,
-  "5y": 60,
-};
+  "1month": 1,
+  "3months": 3,
+  "6months": 6,
+  "1year": 12,
+  "3years": 36,
+  "5years": 60,
+}
 
 function getMonths(period: ForecastPeriod) {
-  return FORECAST_MONTHS[period];
+  return FORECAST_MONTHS[period]
 }
 
 function getMonthlyAverageFromDatedItems<T extends { date: string; amount: number }>(

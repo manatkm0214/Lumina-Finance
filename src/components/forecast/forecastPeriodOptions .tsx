@@ -4,7 +4,6 @@ import { useMemo, useState } from "react"
 import { useFinanceContext } from "@/hooks/useFinanceContext"
 import { calculateForecast } from "@/lib/calc/forecast"
 import { formatCurrency } from "@/lib/calc/basic"
-import { } from "@/constants/options"
 import type { ForecastPeriod } from "@/types/finance"
 import { SelectField } from "@/components/common/SelectField"
 

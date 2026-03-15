@@ -1,31 +1,71 @@
 "use client"
-import { SavingsRecordForm } from "@/components/savings/SavingsRecordForm"
-import { SavingsRecordList } from "@/components/savings/SavingsRecordList"
+import { SavingsRecordForm } from "@/components/saving/SavingsRecordForm"
+import { SavingsRecordList } from "@/components/saving/SavingsRecordList"
 import type { SavingsRecordItem } from "@/types/finance"
 import { useMemo, useState } from "react"
 import { FinanceProvider, useFinanceProvider } from "@/hooks/useFinanceProvider"
-
 import { FinanceDashboard } from "@/components/dashboard/FinanceDashboard"
 import { DeficitAlertCard } from "@/components/dashboard/DeficitAlertCard"
+import { ExpensePieChart } from "@/components/charts/ExpensePieChart"
+import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart"
 
 import { IncomeForm } from "@/components/income/IncomeForm"
 import { IncomeList } from "@/components/income/IncomeList"
-
 import { ExpenseForm } from "@/components/expense/ExpenseForm"
 import { ExpenseList } from "@/components/expense/ExpenseList"
-
-import { ExpensePieChart } from "@/components/charts/ExpensePieChart"
-import { MonthlyTrendChart } from "@/components/charts/MonthlyTrendChart"
 
 import { expenseCategoryOptions } from "@/constants/options"
 
 import type {
   ExpenseCategory,
-  ForecastPeriod,
+  ForecastShortPeriod, // ForecastPeriod ではなくこちら
   IncomeItem,
   ExpenseItem,
   FinanceState,
+  AppSettings,
 } from "@/types/finance"
+
+const STORAGE_KEY = "rebalance-finance-state-v4"
+const SETTINGS_KEY = "rebalance-finance-settings-v4"
+
+const initialSettings: AppSettings = {
+  budgetPeriod: "monthly",        // ← 追加
+  household: {                    // ← 追加
+    familySize: "1",
+    housing: {
+      type: "rent",
+      monthlyRent: 0,
+      monthlyMortgage: 0,
+      monthlyManagementFee: 0,
+      monthlyRepairReserve: 0,
+      monthlyParkingFee: 0,
+    },
+  },
+  bucketRules: [],                // ← 追加
+  investmentUnlockCondition: {
+    maxDeficitRate: 0.05,
+    maxFixedCostRate: 0.5,
+    minSavingsRate: 0.2,
+    targetEmergencyFundMonths: 6,
+  },
+  monthlyLivingCost: 0,
+  currentEmergencyFund: 0,
+  savingsGoalAmount: 0,
+  savingsGoalPeriod: "1m",
+}
+
+const initialState: FinanceState = {
+  settings: initialSettings,
+  incomes: [],
+  expenses: [],
+  emotions: [],         // ← 追加
+  budgets: [],          // ← 追加
+  savingsRecords: [],
+  deficit: 0,           // ← 追加
+  savingGoal: 0,        // ← 追加
+  uxMode: "standard",
+  forecastPeriod: "6m", // ← 追加
+}
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("ja-JP", {
@@ -35,16 +75,15 @@ function formatCurrency(value: number) {
   }).format(value)
 }
 
-const FORECAST_MONTH_MAP = {
+const FORECAST_MONTH_MAP: Record<ForecastShortPeriod, number> = {
   "3m": 3,
   "6m": 6,
   "1y": 12,
   "5y": 60,
-} as const
+}
 
 function MainPageContent() {
-  const { state, setUxMode } =
-    useFinanceProvider()
+  const { state, setUxMode, setIncomes, setExpenses } = useFinanceProvider()
 
   const [editingIncome, setEditingIncome] = useState<IncomeItem | null>(null)
   const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null)
@@ -56,7 +95,7 @@ function MainPageContent() {
     useState<ExpenseCategory | "all">("all")
 
   const [forecastPeriod, setForecastPeriod] =
-    useState<ForecastPeriod>("3m")
+    useState<ForecastShortPeriod>("3m")
 
   const totalIncome = state.incomes.reduce(
     (sum: number, item: IncomeItem) => sum + item.amount,
@@ -98,6 +137,34 @@ function MainPageContent() {
       return categoryOk && keywordOk
     })
   }, [state.expenses, expenseSearch, expenseCategoryFilter])
+
+  const addIncome = (item: IncomeItem) => {
+    setIncomes([item, ...state.incomes])
+  }
+
+  const updateIncome = (item: IncomeItem) => {
+    setIncomes(state.incomes.map((x) => (x.id === item.id ? item : x)))
+    setEditingIncome(null)
+  }
+
+  const deleteIncome = (id: string) => {
+    setIncomes(state.incomes.filter((x) => x.id !== id))
+    if (editingIncome?.id === id) setEditingIncome(null)
+  }
+
+  const addExpense = (item: ExpenseItem) => {
+    setExpenses([item, ...state.expenses])
+  }
+
+  const updateExpense = (item: ExpenseItem) => {
+    setExpenses(state.expenses.map((x) => (x.id === item.id ? item : x)))
+    setEditingExpense(null)
+  }
+
+  const deleteExpense = (id: string) => {
+    setExpenses(state.expenses.filter((x) => x.id !== id))
+    if (editingExpense?.id === id) setEditingExpense(null)
+  }
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 md:px-8">
@@ -145,7 +212,7 @@ function MainPageContent() {
           <select
             value={forecastPeriod}
             onChange={(e) =>
-              setForecastPeriod(e.target.value as ForecastPeriod)
+              setForecastPeriod(e.target.value as ForecastShortPeriod)
             }
             className="border rounded px-3 py-2"
           >
@@ -190,19 +257,17 @@ function MainPageContent() {
 
         <IncomeForm
           editingItem={editingIncome}
-          onEditFinish={() => setEditingIncome(null)} onAddItem={function (item: IncomeItem): void {
-            throw new Error("Function not implemented.")
-          } } onUpdateItem={function (item: IncomeItem): void {
-            throw new Error("Function not implemented.")
-          } }        />
+          onEditFinish={() => setEditingIncome(null)}
+          onAddItem={addIncome}
+          onUpdateItem={updateIncome}
+        />
 
-        <ExpenseForm editingItem={editingExpense} onAddItem={function (item: ExpenseItem): void {
-          throw new Error("Function not implemented.")
-        } } onUpdateItem={function (item: ExpenseItem): void {
-          throw new Error("Function not implemented.")
-        } } onEditFinishAction={function (): void {
-          throw new Error("Function not implemented.")
-        } } />
+        <ExpenseForm
+          editingItem={editingExpense}
+          onAddItem={addExpense}
+          onUpdateItem={updateExpense}
+          onEditFinishAction={() => setEditingExpense(null)}
+        />
 
         <section className="bg-white p-4 rounded shadow">
 
@@ -216,8 +281,10 @@ function MainPageContent() {
           />
 
           <IncomeList
-              items={filteredIncomes}
-            />
+            items={filteredIncomes}
+            onEditItem={setEditingIncome}
+            onDeleteItemAction={deleteIncome}
+          />
 
         </section>
 
@@ -255,6 +322,8 @@ function MainPageContent() {
 
           <ExpenseList
             items={filteredExpenses}
+            onEditItemAction={setEditingExpense}
+            onDeleteItemAction={deleteExpense}
           />
 
         </section>

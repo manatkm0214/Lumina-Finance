@@ -2,23 +2,48 @@
 
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import type { FinanceState } from "@/types/finance"
+import type { AppSettings, FinanceState } from "@/types/finance"
+import { formatCurrency } from "@/lib/calc/basic" // ← 追加
 
 const STORAGE_KEY = "rebalance-finance-state-v4"
 
-const initialState: FinanceState = {
-  incomes: [],
-  expenses: [],
-  savingsRecords: [],
-  uxMode: "standard",
+const initialSettings: AppSettings = {
+  budgetPeriod: "monthly",        // ← 追加
+  household: {                    // ← 追加
+    familySize: "1",
+    housing: {
+      type: "rent",
+      monthlyRent: 0,
+      monthlyMortgage: 0,
+      monthlyManagementFee: 0,
+      monthlyRepairReserve: 0,
+      monthlyParkingFee: 0,
+    },
+  },
+  bucketRules: [],                // ← 追加
+  investmentUnlockCondition: {
+    maxDeficitRate: 0.05,
+    maxFixedCostRate: 0.5,
+    minSavingsRate: 0.2,
+    targetEmergencyFundMonths: 6,
+  },
+  monthlyLivingCost: 0,
+  currentEmergencyFund: 0,
+  savingsGoalAmount: 0,
+  savingsGoalPeriod: "1m",
 }
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("ja-JP", {
-    style: "currency",
-    currency: "JPY",
-    maximumFractionDigits: 0,
-  }).format(value)
+const initialState: FinanceState = {
+  settings: initialSettings,
+  incomes: [],
+  expenses: [],
+  emotions: [],       // ← 追加
+  budgets: [],        // ← 追加
+  savingsRecords: [],
+  deficit: 0,         // ← 追加
+  savingGoal: 0,      // ← 追加
+  uxMode: "standard",
+  forecastPeriod: "6m", // ← 追加
 }
 
 function loadState(): FinanceState {
@@ -27,7 +52,25 @@ function loadState(): FinanceState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return initialState
-    return JSON.parse(raw)
+
+    const parsed = JSON.parse(raw) as Partial<FinanceState>
+    return {
+      ...initialState,
+      ...parsed,
+      settings: {
+        ...initialSettings,
+        ...(parsed.settings ?? {}),
+        investmentUnlockCondition: {
+          ...initialSettings.investmentUnlockCondition,
+          ...(parsed.settings?.investmentUnlockCondition ?? {}),
+        },
+      },
+      incomes: parsed.incomes ?? [],
+      expenses: parsed.expenses ?? [],
+      savingsRecords: parsed.savingsRecords ?? [],
+      deficit: parsed.deficit ?? 0,
+      savingGoal: parsed.savingGoal ?? 0,
+    }
   } catch {
     return initialState
   }

@@ -62,14 +62,16 @@ export function analyzeExpenses(
   }
 
   const fixedCostTotal = expenses
-    .filter((item) => item.costType === "fixed")
+    .filter((item) => item.type === "fixed")
     .reduce((sum, item) => sum + item.amount, 0)
 
   const variableCostTotal = expenses
-    .filter((item) => item.costType === "variable")
+    .filter((item) => item.type === "variable")
     .reduce((sum, item) => sum + item.amount, 0)
 
-  const impulseItems = expenses.filter((item) => item.necessity === "optional" && item.costType === "variable")
+  const impulseItems = expenses.filter(
+    (item) => item.necessity === "impulse" && item.type === "variable"
+  )
   const impulseBuyCount = impulseItems.length
   const impulseBuyAmount = impulseItems.reduce((sum, item) => sum + item.amount, 0)
 

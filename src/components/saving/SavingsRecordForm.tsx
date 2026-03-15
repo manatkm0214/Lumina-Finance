@@ -1,22 +1,22 @@
 "use client"
 
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react"
+import { useState } from "react"
 import { savingsRecordTypeOptions } from "@/constants/options"
-import type { SavingsRecordItem, SavingsRecordType } from "@/types/finance"
+import type { DateString, SavingsRecordItem, SavingsRecordType } from "@/types/finance"
 
 type SavingsRecordFormProps = {
-  onAddItem: (item: SavingsRecordItem) => void
+  onAddItemAction: (item: SavingsRecordItem) => void
 }
 
 type FormValue = {
-  date: string
+  date: DateString
   type: SavingsRecordType
   amount: string
   memo: string
 }
 
-function getToday() {
-  return new Date().toISOString().slice(0, 10)
+function getToday(): DateString {
+  return new Date().toISOString().slice(0, 10) as DateString
 }
 
 function createInitialForm(): FormValue {
@@ -28,7 +28,7 @@ function createInitialForm(): FormValue {
   }
 }
 
-export function SavingsRecordForm({ onAddItem }: SavingsRecordFormProps) {
+export function SavingsRecordForm({ onAddItemAction }: SavingsRecordFormProps) {
   const [form, setForm] = useState<FormValue>(createInitialForm())
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,7 +40,7 @@ export function SavingsRecordForm({ onAddItem }: SavingsRecordFormProps) {
       return
     }
 
-    onAddItem({
+    onAddItemAction({
       id: crypto.randomUUID(),
       date: form.date,
       type: form.type,
@@ -59,7 +59,9 @@ export function SavingsRecordForm({ onAddItem }: SavingsRecordFormProps) {
         <input
           type="date"
           value={form.date}
-          onChange={(e) => setForm((prev) => ({ ...prev, date: e.target.value }))}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, date: e.target.value as DateString }))
+          }
           className="w-full rounded border px-3 py-2"
         />
 
@@ -73,8 +75,8 @@ export function SavingsRecordForm({ onAddItem }: SavingsRecordFormProps) {
           }
           className="w-full rounded border px-3 py-2"
         >
-          {savingsRecordTypeOptions.map((option: { value: string | number | readonly string[] | undefined; label: ReactNode }) => (
-            <option key={String(option.value)} value={option.value}>
+          {savingsRecordTypeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}

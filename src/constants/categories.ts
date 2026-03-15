@@ -1,17 +1,11 @@
-import type {
-  ExpenseCategory,
-  ExpenseSubCategory,
-  SelectOption,
-} from "@/types/finance";
+import type { ExpenseCategory, ExpenseSubCategory, SelectOption } from "@/types/finance";
 
-export const expenseSubCategories: Record<
-  ExpenseCategory,
-  SelectOption<ExpenseSubCategory>[]
-> = {
+export const expenseSubCategories: Record<ExpenseCategory, SelectOption<ExpenseSubCategory>[]> = {
   food: [
     { value: "homeCooking", label: "自炊" },
     { value: "eatingOut", label: "外食" },
     { value: "cafe", label: "カフェ" },
+    { value: "groceries", label: "食材" },
     { value: "convenienceStore", label: "コンビニ" },
     { value: "snacks", label: "おやつ" },
     { value: "drinks", label: "飲み物" },
@@ -20,6 +14,7 @@ export const expenseSubCategories: Record<
   ],
   daily: [
     { value: "consumables", label: "消耗品" },
+    { value: "materials", label: "材料費" },
     { value: "detergent", label: "洗剤" },
     { value: "paperGoods", label: "紙類" },
     { value: "kitchenGoods", label: "キッチン用品" },
@@ -39,11 +34,10 @@ export const expenseSubCategories: Record<
     { value: "moving", label: "引っ越し" },
     { value: "other", label: "その他" },
   ],
-  utilities: [
+  utility: [
     { value: "electricity", label: "電気" },
     { value: "gas", label: "ガス" },
     { value: "water", label: "水道" },
-    { value: "kerosene", label: "灯油" },
     { value: "other", label: "その他" },
   ],
   communication: [
@@ -53,42 +47,11 @@ export const expenseSubCategories: Record<
     { value: "device", label: "通信機器" },
     { value: "other", label: "その他" },
   ],
-  transportation: [
+  transport: [
     { value: "train", label: "電車" },
     { value: "bus", label: "バス" },
-    { value: "taxi", label: "タクシー" },
-    { value: "gasoline", label: "ガソリン" },
-    { value: "highway", label: "高速料金" },
-    { value: "bicycleParking", label: "駐輪場" },
-    { value: "carParking", label: "駐車場" },
-    { value: "carMaintenance", label: "車検・整備" },
-    { value: "other", label: "その他" },
-  ],
-  insurance: [
-    { value: "lifeInsurance", label: "生命保険" },
-    { value: "medicalInsurance", label: "医療保険" },
-    { value: "cancerInsurance", label: "がん保険" },
-    { value: "carInsurance", label: "自動車保険" },
-    { value: "fireInsurance", label: "火災保険" },
-    { value: "personalPension", label: "個人年金" },
-    { value: "other", label: "その他" },
-  ],
-  medical: [
-    { value: "hospital", label: "病院" },
-    { value: "medicine", label: "薬" },
-    { value: "dental", label: "歯科" },
-    { value: "contactsGlasses", label: "コンタクト・眼鏡" },
-    { value: "bodyCare", label: "整体・マッサージ" },
-    { value: "inspection", label: "検査" },
-    { value: "other", label: "その他" },
-  ],
-  education: [
-    { value: "tuition", label: "学費" },
-    { value: "materials", label: "教材" },
-    { value: "cramSchool", label: "塾" },
-    { value: "qualification", label: "資格" },
-    { value: "books", label: "書籍" },
-    { value: "seminar", label: "セミナー" },
+    { value: "parking", label: "駐車場" },
+    { value: "inspection", label: "点検・整備" },
     { value: "other", label: "その他" },
   ],
   entertainment: [
@@ -102,49 +65,48 @@ export const expenseSubCategories: Record<
     { value: "other", label: "その他" },
   ],
   beautyClothing: [
-    { value: "clothes", label: "服" },
+    { value: "clothing", label: "服" },
     { value: "shoes", label: "靴" },
     { value: "bag", label: "バッグ" },
     { value: "cosmetics", label: "コスメ" },
     { value: "hairSalon", label: "美容院" },
     { value: "nail", label: "ネイル" },
     { value: "skinCare", label: "スキンケア" },
+    { value: "bodyCare", label: "ボディケア" },
+    { value: "tops", label: "トップス" },
     { value: "other", label: "その他" },
   ],
-  social: [
-    { value: "gift", label: "プレゼント" },
-    { value: "drinkingParty", label: "飲み会" },
-    { value: "dining", label: "会食" },
-    { value: "ceremonial", label: "冠婚葬祭" },
-    { value: "allowanceSupport", label: "仕送り" },
-    { value: "date", label: "デート" },
+  insurance: [
+    { value: "lifeInsurance", label: "生命保険" },
+    { value: "medicalInsurance", label: "医療保険" },
+    { value: "cancerInsurance", label: "がん保険" },
+    { value: "carInsurance", label: "自動車保険" },
+    { value: "fireInsurance", label: "火災保険" },
+    { value: "personalPension", label: "個人年金" },
+    { value: "nationalPension", label: "国民年金" },
+    { value: "nationalHealthInsurance", label: "国民健康保険" },
     { value: "other", label: "その他" },
   ],
   tax: [
     { value: "residentTax", label: "住民税" },
     { value: "incomeTax", label: "所得税" },
-    { value: "nationalPension", label: "国民年金" },
-    { value: "nationalHealthInsurance", label: "国民健康保険" },
-    { value: "propertyTax", label: "固定資産税" },
-    { value: "carTax", label: "自動車税" },
     { value: "other", label: "その他" },
   ],
-  subscription: [
-    { value: "videoStreaming", label: "動画配信" },
-    { value: "musicStreaming", label: "音楽配信" },
-    { value: "learningService", label: "学習サービス" },
-    { value: "cloudStorage", label: "クラウド保存" },
-    { value: "software", label: "ソフトウェア" },
-    { value: "membership", label: "メンバーシップ" },
+  medical: [
+    { value: "hospital", label: "病院" },
+    { value: "dental", label: "歯科" },
+    { value: "medicine", label: "薬" },
+    { value: "contactsGlasses", label: "コンタクト・眼鏡" },
+    { value: "inspection", label: "検査" },
     { value: "other", label: "その他" },
   ],
-  special: [
-    { value: "applianceReplacement", label: "家電買い替え" },
-    { value: "ceremonial", label: "冠婚葬祭" },
-    { value: "moving", label: "引っ越し" },
-    { value: "travel", label: "旅行" },
-    { value: "largeMedicalCost", label: "大型医療費" },
-    { value: "bulkTaxPayment", label: "税金一括支払い" },
+  education: [
+    { value: "tuition", label: "学費" },
+    { value: "materials", label: "教材" },
+    { value: "cramSchool", label: "塾" },
+    { value: "qualification", label: "資格" },
+    { value: "books", label: "書籍" },
+    { value: "seminar", label: "セミナー" },
     { value: "other", label: "その他" },
   ],
   other: [{ value: "other", label: "その他" }],
